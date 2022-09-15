@@ -22,7 +22,7 @@ Simple GUI in Python (Tkinter) to create, read and edit databases from sqlite - 
 **Create db WINDOW** - the last element to create new database
 * Database name - name your database
 * Table name - name your table
-* Define type of variables - define type of variables in passed columns
+* Define type of variables - define type of variables in passed columns (seperate all types with ,)
 * Create database - button to create new database
 
 ![image](https://user-images.githubusercontent.com/99027230/190420174-ad0843e6-5cc0-4ba3-9751-5393547fa424.png)
@@ -58,5 +58,20 @@ Then enter the path and the name of the database with .db
 After that click on Read and Edit button
 
 ![image](https://user-images.githubusercontent.com/99027230/190425256-c79ed77e-4f46-4416-bf5a-96bffb620e0d.png)
+
+Then, on the main window you will see a table with data and inputs and labels with the names of variables and their types
+
+![image](https://user-images.githubusercontent.com/99027230/190430755-9133c7ab-c1c9-461e-b74c-7f8b63e2f523.png)
+
+Now, you can edit your database:
+
+![image](https://user-images.githubusercontent.com/99027230/190431209-2b0732df-14f8-4044-8999-60aea3e9f198.png)
+
+**All elements in main window are resizable** - you can control the size of window!
+
+![image](https://user-images.githubusercontent.com/99027230/190431952-6d012ec3-a09b-42a7-b7e0-f37e6abaee05.png)
+
+![image](https://user-images.githubusercontent.com/99027230/190432027-87cd56e4-12fc-45b6-a476-27396f9ec1e1.png)
+
 
 
