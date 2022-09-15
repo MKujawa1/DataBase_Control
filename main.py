@@ -10,6 +10,8 @@ class Database_app:
         main_window.resizable(width=1, height=1)
         main_window.geometry('1000x400')
         main_window.minsize(400,300)
+        main_window.iconbitmap('db_icon.ico')
+
 
         style = ttk.Style()
         style.theme_use('alt')
@@ -103,6 +105,7 @@ class Database_app:
         self.crw = tk.Toplevel(self.main_window)
         self.crw.title("Create/Read db")
         self.crw.resizable(False, False)
+        self.crw.iconbitmap('db_icon.ico')
         self.crw.geometry("400x170")
         tk.Grid.columnconfigure(self.crw, 0, weight=1)
         for i in range(6):
@@ -128,6 +131,7 @@ class Database_app:
         self.crw.destroy()
         self.cd = tk.Toplevel(self.main_window)
         self.cd.title("Create db")
+        self.cd.iconbitmap('db_icon.ico')
         self.cd.resizable(False, False)
         self.cd.geometry("400x250")
 
@@ -173,7 +177,7 @@ class Database_app:
 
         self.create_labels_entres()
         self.tree.destroy()
-        self.tree = ttk.tree(self.frame_2, selectmode='browse')
+        self.tree = ttk.Treeview(self.frame_2, selectmode='browse')
         self.tree.bind('<ButtonRelease-1>', self.selectItem)
         self.create_table()
 
