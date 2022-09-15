@@ -7,7 +7,7 @@ Simple GUI in Python (Tkinter) to create, read and edit databases from sqlite - 
 * Update - button to update record
 * Delete - button to delete record
 
-![image](https://user-images.githubusercontent.com/99027230/190415189-d1190897-a79a-4626-814b-e4c240e82140.png)
+![image](https://user-images.githubusercontent.com/99027230/190432478-bb6f5bf1-a574-40cb-8ad0-dd2e8368b7a9.png)
 
 **Create/Read db WINDOW** - place to read or create database
 * Insert path - path to read or create db
