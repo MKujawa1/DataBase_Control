@@ -1,7 +1,6 @@
 from tkinter import ttk
 import tkinter as tk
 import sqlite3
-import numpy as np
 
 class Database_app:
     def __init__(self, main_window):
@@ -153,12 +152,40 @@ class Database_app:
 
     def read_db(self):
         self.path = self.path_entry.get()
-        print(self.path)
+        # print(self.path)
+        self.db = sqlite3.connect(self.path)
+        self.cursor = self.db.cursor()
+
+        sql_table_name = "SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%'"
+        self.cursor.execute(sql_table_name)
+
+        for x in self.cursor:
+            self.table_name = x
+        self.table_name = self.table_name[0]
+        sql_column_names = f"PRAGMA table_info({self.table_name})"
+        print(sql_column_names)
+        self.cursor.execute(sql_column_names)
+        self.colnames = []
+        self.variables = []
+        for x in self.cursor:
+            self.colnames.append(x[1])
+            self.variables.append(x[2])
+
+        self.create_labels_entres()
+        self.treev = ttk.Treeview(self.frame_2, selectmode='browse')
+        self.treev.bind('<ButtonRelease-1>', self.selectItem)
+        self.create_table()
+
+        sql_data_from_table = "SELECT * FROM " + self.table_name
+        self.cursor.execute(sql_data_from_table)
+
+        for x in self.cursor:
+            self.treev.insert("", 'end', text="value",values=(x))
 
         self.crw.destroy()
 
     def create_database(self):
-        print(self.path+'\\'+self.name_entry.get())
+
         self.variables = self.desc_entry.get().split(',')
         self.table_name = self.table_entry.get()
         sql = "CREATE TABLE " + self.table_name+" ("
