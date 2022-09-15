@@ -63,39 +63,39 @@ class Database_app:
         update = tk.Button(frame_in_1_3, text='Update',command = self.update_data).grid(row=0, sticky='sw', column=1, pady=3, padx=10, ipadx=10)
         delete = tk.Button(frame_in_1_3, text='Delete',command = self.delete_data).grid(row=0, sticky='sw', column=2, pady=3, padx=1, ipadx=10)
 
-        self.treev = ttk.Treeview(self.frame_2, selectmode='browse')
-        self.treev.bind('<ButtonRelease-1>', self.selectItem)
+        self.tree = ttk.Treeview(self.frame_2, selectmode='browse')
+        self.tree.bind('<ButtonRelease-1>', self.selectItem)
 
     def add_item(self):
         list_of_entres = []
         for i in range(len(self.entres)):
             list_of_entres.append((self.entres[i].get()))
-        self.treev.insert("", 'end', text="value",
+        self.tree.insert("", 'end', text="value",
                           values=(list_of_entres))
         self.convertion()
         self.write_to_db()
 
     def selectItem(self,non):
-        curItem = self.treev.focus()
-        self.list_of_values = self.treev.item(curItem)['values']
+        curItem = self.tree.focus()
+        self.list_of_values = self.tree.item(curItem)['values']
         # print(self.list_of_values)
         for x, val in enumerate(self.list_of_values):
             self.entres[x].delete(0,tk.END)
             self.entres[x].insert(0,val)
 
     def delete_data(self,):
-        selected_item = self.treev.selection()[0]
-        self.treev.delete(selected_item)
+        selected_item = self.tree.selection()[0]
+        self.tree.delete(selected_item)
         self.delete_from_db()
 
     def update_data(self):
-        curItem = self.treev.focus()
-        self.list_of_values = self.treev.item(curItem)['values']
+        curItem = self.tree.focus()
+        self.list_of_values = self.tree.item(curItem)['values']
         self.new_values = []
         for i in range(len(self.entres)):
             self.new_values.append((self.entres[i].get()))
-        curItem = self.treev.focus()
-        self.treev.item(curItem,text='value',values = (self.new_values))
+        curItem = self.tree.focus()
+        self.tree.item(curItem,text='value',values = (self.new_values))
 
         self.update_db_record()
 
@@ -172,15 +172,16 @@ class Database_app:
             self.variables.append(x[2])
 
         self.create_labels_entres()
-        self.treev = ttk.Treeview(self.frame_2, selectmode='browse')
-        self.treev.bind('<ButtonRelease-1>', self.selectItem)
+        self.tree.destroy()
+        self.tree = ttk.tree(self.frame_2, selectmode='browse')
+        self.tree.bind('<ButtonRelease-1>', self.selectItem)
         self.create_table()
 
         sql_data_from_table = "SELECT * FROM " + self.table_name
         self.cursor.execute(sql_data_from_table)
 
         for x in self.cursor:
-            self.treev.insert("", 'end', text="value",values=(x))
+            self.tree.insert("", 'end', text="value",values=(x))
 
         self.crw.destroy()
 
@@ -200,9 +201,9 @@ class Database_app:
         self.db.commit()
         self.cd.destroy()
         self.create_labels_entres()
-        self.treev.destroy()
-        self.treev = ttk.Treeview(self.frame_2, selectmode='browse')
-        self.treev.bind('<ButtonRelease-1>', self.selectItem)
+        self.tree.destroy()
+        self.tree = ttk.Treeview(self.frame_2, selectmode='browse')
+        self.tree.bind('<ButtonRelease-1>', self.selectItem)
         self.create_table()
 
     def create_labels_entres(self):
@@ -226,16 +227,16 @@ class Database_app:
             cnt+=1
 
     def create_table(self):
-        self.treev.grid(row=0, column=0, sticky='nsew', padx=3, pady=3)
+        self.tree.grid(row=0, column=0, sticky='nsew', padx=3, pady=3)
         self.verscrlbar = ttk.Scrollbar(self.main_window,
                                    orient="vertical",
-                                   command=self.treev.yview)
-        self.treev.configure(xscrollcommand=self.verscrlbar.set)
-        self.treev['show'] = 'headings'
-        self.treev["columns"] = tuple([str(x) for x in range(1, len(self.colnames) + 1)])
+                                   command=self.tree.yview)
+        self.tree.configure(xscrollcommand=self.verscrlbar.set)
+        self.tree['show'] = 'headings'
+        self.tree["columns"] = tuple([str(x) for x in range(1, len(self.colnames) + 1)])
         for x, c in enumerate(self.colnames):
-            self.treev.column(x + 1, width = 1, anchor='c')
-            self.treev.heading(str(x + 1), text=c)
+            self.tree.column(x + 1, width = 1, anchor='c')
+            self.tree.heading(str(x + 1), text=c)
 
     def convertion(self):
         self.data_to_write = []
