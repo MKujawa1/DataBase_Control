@@ -78,9 +78,9 @@ class Database_app:
 
     def selectItem(self,non):
         curItem = self.treev.focus()
-        list_of_values = self.treev.item(curItem)['values']
-        print(list_of_values)
-        for x, val in enumerate(list_of_values):
+        self.list_of_values = self.treev.item(curItem)['values']
+        # print(self.list_of_values)
+        for x, val in enumerate(self.list_of_values):
             self.entres[x].delete(0,tk.END)
             self.entres[x].insert(0,val)
 
@@ -90,14 +90,17 @@ class Database_app:
         self.delete_from_db()
 
     def update_data(self):
-        list_of_entres = []
-        for i in range(len(self.entres)):
-            list_of_entres.append((self.entres[i].get()))
         curItem = self.treev.focus()
-        self.treev.item(curItem,text='value',values = (list_of_entres))
+        self.list_of_values = self.treev.item(curItem)['values']
+        self.new_values = []
+        for i in range(len(self.entres)):
+            self.new_values.append((self.entres[i].get()))
+        curItem = self.treev.focus()
+        self.treev.item(curItem,text='value',values = (self.new_values))
+
+        self.update_db_record()
 
     def create_read_window(self):
-
         self.crw = tk.Toplevel(self.main_window)
         self.crw.title("Create/Read db")
         self.crw.resizable(False, False)
@@ -105,8 +108,6 @@ class Database_app:
         tk.Grid.columnconfigure(self.crw, 0, weight=1)
         for i in range(6):
             tk.Grid.rowconfigure(self.crw, i, weight=1)
-
-
         path_label = tk.Label(self.crw, text='Insert path').grid(row=0, column=0, sticky='nsw', padx=10, pady=3)
         self.path_entry = tk.Entry(self.crw, text='input path')
         pe = self.path_entry
@@ -121,13 +122,11 @@ class Database_app:
 
     def create_db(self):
         self.path = self.path_entry.get()
-        print(self.path)
-
+        # print(self.path)
         self.colnames = self.col_entry.get().split(',')
-        print(self.colnames)
+        # print(self.colnames)
 
         self.crw.destroy()
-
         self.cd = tk.Toplevel(self.main_window)
         self.cd.title("Create db")
         self.cd.resizable(False, False)
@@ -249,6 +248,27 @@ class Database_app:
         self.sql_query_del = self.sql_query_del[:-5]
         # print(self.sql_query_del)
         self.cursor.execute(self.sql_query_del)
+        self.db.commit()
+
+    def update_db_record(self):
+        self.sql_query_update = ''
+        self.sql_query_update = "UPDATE " + self.table_name + ' SET '
+
+        for x,c in enumerate(self.colnames):
+            if "VARCHAR" in self.variables[x].upper():
+                self.sql_query_update = self.sql_query_update + c + ' = ' +"'"+self.new_values[x]+"'"+','
+            else:
+                self.sql_query_update = self.sql_query_update + c + ' = ' + str(self.new_values[x]) + ','
+        self.sql_query_update = self.sql_query_update[:-1]
+        self.sql_query_update = self.sql_query_update + ' WHERE '
+        for x,c in enumerate(self.colnames):
+            if "VARCHAR" in self.variables[x].upper():
+                self.sql_query_update = self.sql_query_update + c + ' = ' +"'"+self.list_of_values[x]+"'"+' AND '
+            else:
+                self.sql_query_update = self.sql_query_update + c + ' = ' + str(self.list_of_values[x]) + ' AND '
+        self.sql_query_update = self.sql_query_update[:-5]
+        print(self.sql_query_update)
+        self.cursor.execute(self.sql_query_update)
         self.db.commit()
 
 root = tk.Tk()
