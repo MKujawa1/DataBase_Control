@@ -56,6 +56,7 @@ class Database_app:
         self.entres = []
         self.labels = []
         self.data_to_write = []
+        self.sql_query = ''
 
         # self.create_labels_entres()
 
@@ -64,12 +65,7 @@ class Database_app:
         delete = tk.Button(frame_in_1_3, text='Delete',command = self.delete_data).grid(row=0, sticky='sw', column=2, pady=3, padx=1, ipadx=10)
 
         self.treev = ttk.Treeview(self.frame_2, selectmode='browse')
-        # self.create_table()
         self.treev.bind('<ButtonRelease-1>', self.selectItem)
-
-    def get_entry(self):
-        a = self.entres[0].get()
-        print(a)
 
     def add_item(self):
         list_of_entres = []
@@ -83,6 +79,7 @@ class Database_app:
     def selectItem(self,non):
         curItem = self.treev.focus()
         list_of_values = self.treev.item(curItem)['values']
+        print(list_of_values)
         for x, val in enumerate(list_of_values):
             self.entres[x].delete(0,tk.END)
             self.entres[x].insert(0,val)
@@ -90,6 +87,7 @@ class Database_app:
     def delete_data(self,):
         selected_item = self.treev.selection()[0]
         self.treev.delete(selected_item)
+        self.delete_from_db()
 
     def update_data(self):
         list_of_entres = []
@@ -178,6 +176,7 @@ class Database_app:
         self.create_labels_entres()
         self.treev.destroy()
         self.treev = ttk.Treeview(self.frame_2, selectmode='browse')
+        self.treev.bind('<ButtonRelease-1>', self.selectItem)
         self.create_table()
 
     def create_labels_entres(self):
@@ -223,6 +222,7 @@ class Database_app:
                 self.data_to_write.append(float(self.entres[x].get()))
 
     def write_to_db(self):
+        self.sql_query = ''
         self.sql_query = "INSERT INTO "+self.table_name +' ('
         for col in self.colnames:
             self.sql_query = self.sql_query+col+','
@@ -236,6 +236,19 @@ class Database_app:
         self.sql_query = self.sql_query[:-1]
         self.sql_query = self.sql_query + ')'
         self.cursor.execute(self.sql_query)
+        self.db.commit()
+
+    def delete_from_db(self):
+        self.sql_query_del = ''
+        self.sql_query_del = "DELETE FROM "+ self.table_name + ' WHERE '
+        for x,c in enumerate(self.colnames):
+            if "VARCHAR" in self.variables[x].upper():
+                self.sql_query_del = self.sql_query_del + c + ' = ' + "'"+self.entres[x].get()+ "'" + ' AND '
+            else:
+                self.sql_query_del = self.sql_query_del + c + ' = ' + self.entres[x].get() + ' AND '
+        self.sql_query_del = self.sql_query_del[:-5]
+        # print(self.sql_query_del)
+        self.cursor.execute(self.sql_query_del)
         self.db.commit()
 
 root = tk.Tk()
