@@ -55,14 +55,16 @@ class Database_app:
                                                                                            pady=3, padx=10)
         self.entres = []
         self.labels = []
-        self.create_labels_entres()
+        self.data_to_write = []
+
+        # self.create_labels_entres()
 
         add = tk.Button(frame_in_1_3, text='Add',command = self.add_item).grid(row=0, sticky='sw', column=0, pady=3, padx=10, ipadx=10)
         update = tk.Button(frame_in_1_3, text='Update',command = self.update_data).grid(row=0, sticky='sw', column=1, pady=3, padx=10, ipadx=10)
         delete = tk.Button(frame_in_1_3, text='Delete',command = self.delete_data).grid(row=0, sticky='sw', column=2, pady=3, padx=1, ipadx=10)
 
         self.treev = ttk.Treeview(self.frame_2, selectmode='browse')
-        self.create_table()
+        # self.create_table()
         self.treev.bind('<ButtonRelease-1>', self.selectItem)
 
     def get_entry(self):
@@ -75,6 +77,8 @@ class Database_app:
             list_of_entres.append((self.entres[i].get()))
         self.treev.insert("", 'end', text="value",
                           values=(list_of_entres))
+        self.convertion()
+        self.write_to_db()
 
     def selectItem(self,non):
         curItem = self.treev.focus()
@@ -143,7 +147,7 @@ class Database_app:
         self.table_entry = tk.Entry(self.cd, text='Table name')
         te = self.table_entry
         te.grid(row=3, column=0, sticky='nsew', padx=10, pady=3)
-        type_label = tk.Label(self.cd, text='Define type of variables: integer, varchar(x),boolean').grid(row=4, column=0, sticky='nsw', padx=10, pady=3)
+        type_label = tk.Label(self.cd, text='Define type of variables: integer, varchar(x),real').grid(row=4, column=0, sticky='nsw', padx=10, pady=3)
         desc_label = tk.Label(self.cd, text=self.colnames).grid(row=5, column=0, sticky='nsw', padx=10, pady=3)
         self.desc_entry = tk.Entry(self.cd, text='desc entry')
         de = self.desc_entry
@@ -158,10 +162,11 @@ class Database_app:
 
     def create_database(self):
         print(self.path+'\\'+self.name_entry.get())
-
-        sql = "CREATE TABLE " + self.table_entry.get()+" ("
+        self.variables = self.desc_entry.get().split(',')
+        self.table_name = self.table_entry.get()
+        sql = "CREATE TABLE " + self.table_name+" ("
         for x,col in enumerate(self.colnames):
-            sql = sql+ col + ' '+ self.desc_entry.get().split(',')[x].upper() + ','
+            sql = sql+ col + ' '+ self.variables[x].upper() + ','
         sql = sql[:-1]+')'
         print(sql)
 
@@ -186,16 +191,14 @@ class Database_app:
         self.entres = []
         self.labels = []
 
-        for c in self.colnames:
-            self.labels.append(tk.Label(self.frame_in_1_2, text=c))
+        for x,c in enumerate(self.colnames):
+            self.labels.append(tk.Label(self.frame_in_1_2, text=c+' '+ self.variables[x].upper()))
             self.entres.append(tk.Entry(self.frame_in_1_2, text=c+'input'))
         cnt = 0
         for i in range(0,len(self.colnames)*2,2):
             self.labels[cnt].grid(row=i, sticky='nw', column=0, pady=3, padx=10)
             self.entres[cnt].grid(row=i+1, sticky='nwe', column=0, pady=3, padx=10)
             cnt+=1
-
-
 
     def create_table(self):
         self.treev.grid(row=0, column=0, sticky='nsew', padx=3, pady=3)
@@ -208,6 +211,32 @@ class Database_app:
         for x, c in enumerate(self.colnames):
             self.treev.column(x + 1, width = 1, anchor='c')
             self.treev.heading(str(x + 1), text=c)
+
+    def convertion(self):
+        self.data_to_write = []
+        for x,var in enumerate(self.variables):
+            if var.upper() == 'INTEGER':
+                self.data_to_write.append(int(self.entres[x].get()))
+            elif "VARCHAR" in var.upper():
+                self.data_to_write.append(str(self.entres[x].get()))
+            elif var.upper() == 'REAL':
+                self.data_to_write.append(float(self.entres[x].get()))
+
+    def write_to_db(self):
+        self.sql_query = "INSERT INTO "+self.table_name +' ('
+        for col in self.colnames:
+            self.sql_query = self.sql_query+col+','
+        self.sql_query = self.sql_query[:-1]
+        self.sql_query = self.sql_query + ') VALUES ('
+        for val in self.data_to_write:
+            if type(val) == str:
+                self.sql_query = self.sql_query + "'"+str(val) +"'"+ ','
+            else:
+                self.sql_query = self.sql_query + str(val) + ','
+        self.sql_query = self.sql_query[:-1]
+        self.sql_query = self.sql_query + ')'
+        self.cursor.execute(self.sql_query)
+        self.db.commit()
 
 root = tk.Tk()
 app = Database_app(root)
