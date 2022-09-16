@@ -1,5 +1,5 @@
 # DataBase_Control
-Simple GUI in Python (Tkinter) to create, read and edit databases from sqlite - in progress
+Simple GUI in Python (Tkinter) to create, read and edit databases from sqlite
 
 **MAIN WINDOW** - place to create, read or edit database
 * Create / Read and Edit - button to create or read and edit database from file
